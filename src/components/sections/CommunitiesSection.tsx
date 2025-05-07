@@ -35,24 +35,18 @@ const CommunitiesSection: React.FC = () => {
               { text: "Need clarity on funding?" },
               { text: "Tired of building in isolation?" }
             ]}
-            ctaText="Join the Circle. Build Better, Together."
-            iconName={<Code size={24} />}
-            color="border-blue-600"
           />
 
           {/* Entrepreneurs & Business Owners */}
           <CommunityCard
-            id="entrepreneurs and Business Owner"
-            title="Entrepreneurs and Business Owner"
+            id="entrepreneurs"
+            title="Entrepreneurs & Business Owner"
             headline="Scale Your Business with Strategic Support"
             painPoints={[
               { text: "Cash flow management challenges?" },
               { text: "Customer acquisition hurdles?" },
               { text: "Time & productivity struggles?" }
             ]}
-            ctaText="Join Now—Empower Your Business."
-            iconName={<Briefcase size={24} />}
-            color="border-purple-600"
           />
 
           {/* Authors & Public Speakers */}
@@ -65,9 +59,6 @@ const CommunitiesSection: React.FC = () => {
               { text: "Message going unheard?" },
               { text: "Burnt out juggling content?" }
             ]}
-            ctaText="Join the Network That Grows With You."
-            iconName={<BookOpen size={24} />}
-            color="border-amber-600"
           />
 
           {/* Realtors & Property Investors */}
@@ -80,9 +71,6 @@ const CommunitiesSection: React.FC = () => {
               { text: "Struggling with market shifts?" },
               { text: "Looking for wealth-building insights?" }
             ]}
-            ctaText="Get In the Room. Grow Your Deals."
-            iconName={<Building2 size={24} />}
-            color="border-green-600"
           />
 
           {/* Creatives & Media Professionals */}
@@ -95,55 +83,43 @@ const CommunitiesSection: React.FC = () => {
               { text: "Seeking access to paid gigs?" },
               { text: "Want to grow skills via mentorship?" }
             ]}
-            ctaText="Get In Today."
-            iconName={<Palette size={24} />}
-            color="border-rose-600"
           />
 
           {/* Finance & Investment Pros */}
           <CommunityCard
             id="finance"
-            title="Money"
+            title="Finance & Investment Pros"
             headline="Master the Money Game—With People Who Get It"
             painPoints={[
               { text: "Forex Trading" },
               { text: "Crypto Currency" },
               { text: "Stock Investment" }
             ]}
-            ctaText="Get in the Circle. Grow with the Smart Money."
-            iconName={<LineChart size={24} />}
-            color="border-cyan-600"
-          />
-
-          {/* Health & Wellness Experts */}
-          <CommunityCard
-            id="wellness"
-            title="Wellness Experts"
-            headline="Heal Others. Scale Your Practice. Grow With Us."
-            painPoints={[
-              { text: "Stuck trading hours for cash?" },
-              { text: "Don't know how to expand online?" },
-              { text: "Looking for clients who value your work?" }
-            ]}
-            ctaText="Grow Your Practice. Find Your People."
-            iconName={<Heart size={24} />}
-            color="border-pink-600"
           />
 
           {/* Agricutural */}
           <CommunityCard
-            id="Agric"
+            id="agric"
             title="Agric"
             headline="Empowering Farmers, transforming Agriculture."
             painPoints={[
               { text: "Access to Funding and Capital" },
               { text: "Market Access and Pricing Instability" },
-              { text: "Climate Change and Unpredictable Weather" }
+              { text: "Climate Change and Unpredictable Weather" }
             ]}
-            ctaText="Grow Your Practice. Find Your People."
-            iconName={<Heart size={24} />}
-            color="border-pink-600"
           />
+        </div>
+
+        {/* Special Join Button */}
+        <div className="flex justify-center mt-12">
+          <a
+            href="https://app.mailingboss.com/lists/681b3b93b4049/subscribe" // TODO: Replace with your actual form link
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 px-10 rounded-lg text-xl shadow-lg transition-all duration-200"
+          >
+            Join the Circle
+          </a>
         </div>
 
       </Container>

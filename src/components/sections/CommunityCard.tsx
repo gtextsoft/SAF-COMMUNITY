@@ -10,9 +10,9 @@ type CommunityCardProps = {
   title: string;
   headline: string;
   painPoints: PainPoint[];
-  ctaText: string;
-  iconName: React.ReactNode;
-  color: string;
+  ctaText?: string;
+  iconName?: React.ReactNode;
+  color?: string;
 };
 
 const CommunityCard: React.FC<CommunityCardProps> = ({
@@ -34,15 +34,21 @@ const CommunityCard: React.FC<CommunityCardProps> = ({
     'wellness': 'https://circle.drstephenakintayo.com/wellness'
   };
 
+  const borderColor = color || 'border-gray-300';
+  const iconBg = color ? color.replace('border-', 'bg-').replace('-600', '-100') : 'bg-gray-100';
+  const iconText = color ? color.replace('border-', 'text-') : 'text-gray-400';
+
   return (
     <div 
       id={id}
-      className={`bg-white rounded-xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl border-l-4 ${color}`}
+      className={`bg-white rounded-xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl border-l-4 ${borderColor}`}
     >
       <div className="flex items-center mb-6">
-        <div className={`p-3 rounded-full ${color.replace('border-', 'bg-').replace('-600', '-100')} ${color.replace('border-', 'text-')}`}>
-          {iconName}
-        </div>
+        {iconName && (
+          <div className={`p-3 rounded-full ${iconBg} ${iconText}`}>
+            {iconName}
+          </div>
+        )}
         <h3 className="ml-4 text-xl font-bold text-gray-900">{title}</h3>
       </div>
       
@@ -51,23 +57,26 @@ const CommunityCard: React.FC<CommunityCardProps> = ({
       <ul className="mb-6 space-y-3">
         {painPoints.map((point, index) => (
           <li key={index} className="flex items-start">
-            <span className={`mr-2 text-lg ${color.replace('border-', 'text-')}`}>•</span>
+            <span className={`mr-2 text-lg ${iconText}`}>•</span>
             <span className="text-gray-700">{point.text}</span>
           </li>
         ))}
       </ul>
       
-      <a 
-        href={communityLinks[id as keyof typeof communityLinks]} 
-        target="_blank" 
-        rel="noopener noreferrer"
-      >
-        <Button 
-          className={`w-full mt-4 ${color.replace('border-', 'bg-')} hover:${color.replace('border-', 'bg-').replace('-600', '-700')} text-white border-none`}
+      {/* Only show button if ctaText is provided */}
+      {ctaText && (
+        <a 
+          href={communityLinks[id as keyof typeof communityLinks] || '#'}
+          target="_blank" 
+          rel="noopener noreferrer"
         >
-          {ctaText}
-        </Button>
-      </a>
+          <Button 
+            className={`w-full mt-4 ${color ? color.replace('border-', 'bg-') : 'bg-gray-400'} text-white border-none`}
+          >
+            {ctaText}
+          </Button>
+        </a>
+      )}
     </div>
   );
 };
