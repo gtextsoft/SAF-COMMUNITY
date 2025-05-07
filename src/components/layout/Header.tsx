@@ -49,14 +49,14 @@ const Header: React.FC = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+        isScrolled ? 'bg-black/30 backdrop-blur-lg shadow-lg py-2' : 'bg-transparent py-4'
       }`}
     >
       <Container>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Compass className="h-8 w-8 text-primary-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">Dr. Stephen's Circle</span>
+            <Compass className={`h-8 w-8 ${isScrolled ? 'text-white' : 'text-white'}`} />
+            <span className={`ml-2 text-xl font-bold ${isScrolled ? 'text-white' : 'text-white'}`}>Dr. Stephen's Circle</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -65,18 +65,17 @@ const Header: React.FC = () => {
               <button
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
-                className="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+                className={`${isScrolled ? 'text-white/80 hover:text-white' : 'text-white/80 hover:text-white'} font-medium transition-colors`}
               >
                 {link.name}
               </button>
             ))}
           </nav>
 
-
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="lg:hidden text-gray-700"
+            className="lg:hidden text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <svg
@@ -107,13 +106,13 @@ const Header: React.FC = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-4 bg-white rounded-lg shadow-lg p-4">
+          <div className="lg:hidden mt-4 bg-black/30 backdrop-blur-lg rounded-lg shadow-lg p-4 border border-white/20">
             <div className="flex flex-col space-y-4">
               {navLinks.map((link) => (
                 <button
                   key={link.name}
                   onClick={() => scrollToSection(link.href)}
-                  className="text-gray-600 hover:text-primary-600 font-medium transition-colors text-left px-4 py-2 hover:bg-gray-50 rounded"
+                  className="text-white/80 hover:text-white font-medium transition-colors text-left px-4 py-2 hover:bg-white/10 rounded"
                 >
                   {link.name}
                 </button>

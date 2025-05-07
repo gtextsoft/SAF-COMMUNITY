@@ -16,7 +16,7 @@
 
 body {
   font-family: 'Open Sans', sans-serif;
-  @apply text-gray-900 bg-white;
+  @apply text-white bg-black;
   scroll-behavior: smooth;
 }
 
