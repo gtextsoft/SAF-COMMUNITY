@@ -115,7 +115,7 @@ const CommunitiesSection: React.FC = () => {
           {/* Special Join Button */}
           <div className="flex justify-center mt-12">
             <a
-              href="https://circle.drstephenakintayo.com"
+              href="https://app.mailingboss.com/lists/681b3b93b4049/subscribe"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-gradient-to-r from-accent-violet to-accent-teal text-white font-bold py-4 px-10 rounded-lg text-xl shadow-lg transition-all duration-300 hover:shadow-[0_0_15px_rgba(124,58,237,0.5)] hover:scale-105"

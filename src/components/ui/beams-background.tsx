@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -47,37 +47,75 @@ export function BeamsBackground({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const beamsRef = useRef<Beam[]>([]);
     const animationFrameRef = useRef<number>(0);
-    const MINIMUM_BEAMS = 20;
+    const [isInView, setIsInView] = useState(false);
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const MINIMUM_BEAMS = intensity === "subtle" ? 8 : intensity === "medium" ? 12 : 15;
 
     const opacityMap = {
-        subtle: 0.7,
-        medium: 0.85,
-        strong: 1,
+        subtle: 0.5,
+        medium: 0.7,
+        strong: 0.85,
     };
+
+    // Optimization: Setup intersection observer to only animate when in viewport
+    useEffect(() => {
+        const targetElement = canvasRef.current;
+        if (!targetElement) return;
+
+        observerRef.current = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    setIsInView(entry.isIntersecting);
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        observerRef.current.observe(targetElement);
+
+        return () => {
+            if (observerRef.current && targetElement) {
+                observerRef.current.unobserve(targetElement);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d", { alpha: true });
         if (!ctx) return;
 
         const updateCanvasSize = () => {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            canvas.style.width = `${window.innerWidth}px`;
-            canvas.style.height = `${window.innerHeight}px`;
+            const dpr = 1; // Force DPR to 1 for better performance
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = `${rect.width}px`;
+            canvas.style.height = `${rect.height}px`;
             ctx.scale(dpr, dpr);
 
-            const totalBeams = MINIMUM_BEAMS * 1.5;
+            // Reduce number of beams for better performance
+            const totalBeams = MINIMUM_BEAMS;
             beamsRef.current = Array.from({ length: totalBeams }, () =>
                 createBeam(canvas.width, canvas.height)
             );
         };
 
+        const handleResize = () => {
+            if (canvas.width !== canvas.getBoundingClientRect().width) {
+                updateCanvasSize();
+            }
+        };
+
         updateCanvasSize();
-        window.addEventListener("resize", updateCanvasSize);
+        // Use a throttled resize event for better performance
+        let resizeTimeout: number;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = window.setTimeout(handleResize, 100);
+        });
 
         function resetBeam(beam: Beam, index: number, totalBeams: number) {
             if (!canvas) return beam;
@@ -90,10 +128,10 @@ export function BeamsBackground({
                 column * spacing +
                 spacing / 2 +
                 (Math.random() - 0.5) * spacing * 0.5;
-            beam.width = 100 + Math.random() * 100;
-            beam.speed = 0.5 + Math.random() * 0.4;
+            beam.width = 50 + Math.random() * 50; // Smaller beams
+            beam.speed = 0.3 + Math.random() * 0.3; // Slower movement
             beam.hue = 190 + (index * 70) / totalBeams;
-            beam.opacity = 0.2 + Math.random() * 0.1;
+            beam.opacity = 0.15 + Math.random() * 0.1;
             return beam;
         }
 
@@ -110,23 +148,15 @@ export function BeamsBackground({
 
             const gradient = ctx.createLinearGradient(0, 0, 0, beam.length);
 
-            // Enhanced gradient with multiple color stops
+            // Simplified gradient with fewer color stops
             gradient.addColorStop(0, `hsla(${beam.hue}, 85%, 65%, 0)`);
             gradient.addColorStop(
-                0.1,
-                `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
-            );
-            gradient.addColorStop(
-                0.4,
+                0.3,
                 `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`
             );
             gradient.addColorStop(
-                0.6,
+                0.7,
                 `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`
-            );
-            gradient.addColorStop(
-                0.9,
-                `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`
             );
             gradient.addColorStop(1, `hsla(${beam.hue}, 85%, 65%, 0)`);
 
@@ -135,11 +165,30 @@ export function BeamsBackground({
             ctx.restore();
         }
 
-        function animate() {
+        // Optimize animation with requestAnimationFrame throttling
+        let lastTimestamp = 0;
+        const FPS_THROTTLE = 30; // Limit to 30 FPS
+        const TIME_BETWEEN_FRAMES = 1000 / FPS_THROTTLE;
+
+        function animate(timestamp: number) {
+            if (!isInView) {
+                // Skip animation when not in view
+                animationFrameRef.current = requestAnimationFrame(animate);
+                return;
+            }
+
+            // Throttle the frame rate
+            if (timestamp - lastTimestamp < TIME_BETWEEN_FRAMES) {
+                animationFrameRef.current = requestAnimationFrame(animate);
+                return;
+            }
+            
+            lastTimestamp = timestamp;
+
             if (!canvas || !ctx) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.filter = "blur(35px)";
+            ctx.filter = "blur(30px)";
 
             const totalBeams = beamsRef.current.length;
             beamsRef.current.forEach((beam, index) => {
@@ -157,15 +206,15 @@ export function BeamsBackground({
             animationFrameRef.current = requestAnimationFrame(animate);
         }
 
-        animate();
+        animate(0);
 
         return () => {
-            window.removeEventListener("resize", updateCanvasSize);
+            window.removeEventListener("resize", handleResize);
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, [intensity]);
+    }, [intensity, isInView, MINIMUM_BEAMS]);
 
     return (
         <div
@@ -177,13 +226,13 @@ export function BeamsBackground({
             <canvas
                 ref={canvasRef}
                 className="absolute inset-0"
-                style={{ filter: "blur(15px)" }}
+                style={{ filter: "blur(10px)" }}
             />
 
             <motion.div
                 className="absolute inset-0 bg-neutral-950/5"
                 animate={{
-                    opacity: [0.05, 0.15, 0.05],
+                    opacity: isInView ? [0.05, 0.12, 0.05] : 0.05,
                 }}
                 transition={{
                     duration: 10,
@@ -191,7 +240,7 @@ export function BeamsBackground({
                     repeat: Number.POSITIVE_INFINITY,
                 }}
                 style={{
-                    backdropFilter: "blur(50px)",
+                    backdropFilter: "blur(35px)",
                 }}
             />
 
